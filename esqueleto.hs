@@ -31,7 +31,7 @@ ultimoFrame = error "Implementar!!! (ejercicio 1)"
 
 -- Ejercicio 2/5
 norma :: (Integer, Integer, Integer) -> Float
-norma = error "Implementar!!! (ejercicio 2)"
+norma (x, y, z) = fromInteger(x^2 + y^2 + z^2) ** 0.5
 -- *Main> norma (10, 20, 30)
 -- 37.416573
 
@@ -88,31 +88,31 @@ video0 = Agregar f1 (Agregar f0 (Iniciar f0))
 
 v1f1 :: Frame
 v1f1 = [[p3, p3, p0, p0, p0],
-	  [p3, p3, p0, p0, p0],
-	  [p0, p0, p0, p0, p0],
-	  [p0, p0, p0, p0, p0],
-	  [p0, p0, p0, p0, p0]]
+       [p3, p3, p0, p0, p0],
+       [p0, p0, p0, p0, p0],
+       [p0, p0, p0, p0, p0],
+       [p0, p0, p0, p0, p0]]
 
 v1f2 :: Frame
 v1f2 = [[p0, p0, p0, p0, p0],
-	  [p0, p3, p3, p0, p0],
-	  [p0, p3, p3, p0, p0],
-	  [p0, p0, p0, p0, p0],
-	  [p0, p0, p0, p0, p0]]
+       [p0, p3, p3, p0, p0],
+       [p0, p3, p3, p0, p0],
+       [p0, p0, p0, p0, p0],
+       [p0, p0, p0, p0, p0]]
 
 v1f3 :: Frame
 v1f3 = [[p0, p0, p0, p0, p0],
-	  [p0, p0, p0, p0, p0],
-	  [p0, p0, p3, p3, p0],
-	  [p0, p0, p3, p3, p0],
-	  [p0, p0, p0, p0, p0]]
+       [p0, p0, p0, p0, p0],
+       [p0, p0, p3, p3, p0],
+       [p0, p0, p3, p3, p0],
+       [p0, p0, p0, p0, p0]]
 
 v1f4 :: Frame
 v1f4 = [[p0, p0, p0, p0, p0],
-	  [p0, p0, p0, p0, p0],
-	  [p0, p0, p0, p0, p0],
-	  [p0, p0, p0, p3, p3],
-	  [p0, p0, p0, p3, p3]]
+       [p0, p0, p0, p0, p0],
+       [p0, p0, p0, p0, p0],
+       [p0, p0, p0, p3, p3],
+       [p0, p0, p0, p3, p3]]
 
 
 v1 :: Video
@@ -126,31 +126,31 @@ v1Comp = comprimir v1 1 6
 
 v2f1 :: Frame
 v2f1 = [[p3, p3, p0, p0, p0],
-	  [p3, p3, p0, p0, p0],
-	  [p0, p0, p0, p0, p0],
-	  [p0, p0, p0, p0, p0],
-	  [p0, p0, p0, p0, p0]]
+       [p3, p3, p0, p0, p0],
+       [p0, p0, p0, p0, p0],
+       [p0, p0, p0, p0, p0],
+       [p0, p0, p0, p0, p0]]
 
 v2f2 :: Frame
 v2f2 = [[p0, p0, p0, p0, p0],
-	  [p0, p3, p3, p0, p0],
-	  [p0, p3, p3, p0, p0],
-	  [p0, p0, p0, p0, p0],
-	  [p0, p0, p0, p0, p0]]
+       [p0, p3, p3, p0, p0],
+       [p0, p3, p3, p0, p0],
+       [p0, p0, p0, p0, p0],
+       [p0, p0, p0, p0, p0]]
 
 v2f3 :: Frame
 v2f3 = [[p0, p0, p0, p0, p0],
-	  [p0, p0, p0, p0, p0],
-	  [p0, p0, p3, p3, p3],
-	  [p0, p0, p3, p3, p0],
-	  [p0, p0, p0, p0, p0]]
+       [p0, p0, p0, p0, p0],
+       [p0, p0, p3, p3, p3],
+       [p0, p0, p3, p3, p0],
+       [p0, p0, p0, p0, p0]]
 
 v2f4 :: Frame
 v2f4 = [[p0, p0, p0, p0, p0],
-	  [p0, p0, p0, p0, p0],
-	  [p0, p0, p0, p0, p3],
-	  [p0, p0, p0, p3, p3],
-	  [p0, p0, p0, p3, p3]]
+       [p0, p0, p0, p0, p0],
+       [p0, p0, p0, p0, p3],
+       [p0, p0, p0, p3, p3],
+       [p0, p0, p0, p3, p3]]
 
 
 v2 :: Video
