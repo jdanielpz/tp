@@ -38,17 +38,58 @@ norma (x, y, z) = fromInteger(x^2 + y^2 + z^2) ** 0.5
 
 -- Ejercicio 3/5
 pixelsDiferentesEnFrame :: Frame -> Frame -> Float -> FrameComprimido
-pixelsDiferentesEnFrame = error "Implementar!!! (ejercicio 3)"
+pixelsDiferentesEnFrame f1 f2 u = filtraUmbral (frmDeflate (frmResta f1 f2) 0) u
+-- Ver orden
 -- *Main> pixelsDiferentesEnFrame v1f1 v2f2 1
 -- [(0,0,(3,3,3)),(0,1,(3,3,3)),(1,0,(3,3,3)),(1,2,(-3,-3,-3)),(2,1,(-3,-3,-3)),(2,2,(-3,-3,-3))]
 
+-- Auxiliares Ejercicio 3
+type FrameDelta = [[PixelDelta]]
+
+pixResta :: Pixel -> Pixel -> PixelDelta
+pixResta (r1, g1, b1) (r2, g2, b2) = (r1 - r2, g1 - g2, b1 - b2)
+
+filaResta :: [Pixel] -> [Pixel] -> [PixelDelta]
+filaResta [] [] = []
+filaResta (pixel1:pixels1) (pixel2:pixels2) = (pixResta pixel1 pixel2):(filaResta pixels1 pixels2)
+
+frmResta :: Frame -> Frame -> FrameDelta
+frmResta [] [] = []
+frmResta (fila1:filas1) (fila2:filas2) = (filaResta fila1 fila2):(frmResta filas1 filas2)
+
+frmDeflateFila :: [PixelDelta] -> Integer -> Integer -> FrameComprimido
+frmDeflateFila [] f c = []
+frmDeflateFila (px:pxs) f c = (f, c, px):(frmDeflateFila pxs f (c + 1))
+
+frmDeflate :: FrameDelta -> Integer -> FrameComprimido
+frmDeflate [] f = []
+frmDeflate (fila:filas) f = (frmDeflateFila fila f 0) ++ (frmDeflate filas (f + 1))
+
+filtraUmbral :: FrameComprimido -> Float -> FrameComprimido
+filtraUmbral [] u = []
+filtraUmbral ((f, c, dpx):fc) u | norma dpx > u = (f, c, dpx):(filtraUmbral fc u)
+                                | otherwise = filtraUmbral fc u
 
 -- Ejercicio 4/5
 comprimir :: Video -> Float -> Integer -> VideoComprimido
-comprimir = error "Implementar!!! (ejercicio 4)"
+comprimir v u n = comprimirDesdeLista (listaDesdeVideo v) u n
 
+-- Auxiliares Ejercicio 4
+-- Invierten
+listaDesdeVideo :: Video -> [Frame]
+listaDesdeVideo (Iniciar f) = f:[]
+listaDesdeVideo (Agregar f v) = f:(listaDesdeVideo v)
+
+comprimirDesdeLista :: [Frame] -> Float -> Integer -> VideoComprimido
+comprimirDesdeLista (f:[]) u n = IniciarComp f
+comprimirDesdeLista (f1:f2:fs) u n | fromIntegral (length(fc)) > n = AgregarNormal f1 (comprimirDesdeLista (f2:fs) u n)
+                                   | otherwise = AgregarComprimido fc (comprimirDesdeLista (f2:fs) u n)
+                                     where fc = pixelsDiferentesEnFrame f1 f2 u
 -- Ejercicio 5/5
 descomprimir :: VideoComprimido -> Video
+descomprimir (IniciarComp f) = Iniciar f
+descomprimir (AgregarComprimido fc (AgregarNormal f v)) = Agregar (descomprimirFrame fc f) (descomprimir AgregarNormal f v)
+
 descomprimir = error "Implementar!!! (ejercicio 5)"
 
 
