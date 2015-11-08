@@ -44,11 +44,14 @@ pixelsDiferentesEnFrame f1 f2 u = filtraUmbral (frmDeflate (frmResta f1 f2) 0) u
 -- [(0,0,(3,3,3)),(0,1,(3,3,3)),(1,0,(3,3,3)),(1,2,(-3,-3,-3)),(2,1,(-3,-3,-3)),(2,2,(-3,-3,-3))]
 
 -- Auxiliares Ejercicio 3
+-- FrameDelta es un frame creado como diferencia pixel a pixel entre dos frames.
 type FrameDelta = [[PixelDelta]]
 
+-- pixResta nos permite obtener a partir de dos pixeles la diferencia entre los mismos.
 pixResta :: Pixel -> Pixel -> PixelDelta
 pixResta (r1, g1, b1) (r2, g2, b2) = (r1 - r2, g1 - g2, b1 - b2)
 
+-- filaResta es la diferencia pixel a pixel entre las filas analogas de dos frames.
 filaResta :: [Pixel] -> [Pixel] -> [PixelDelta]
 filaResta [] [] = []
 filaResta (pixel1:pixels1) (pixel2:pixels2) = (pixResta pixel1 pixel2):(filaResta pixels1 pixels2)
@@ -85,13 +88,13 @@ comprimirDesdeLista (f:[]) u n = IniciarComp f
 comprimirDesdeLista (f1:f2:fs) u n | fromIntegral (length(fc)) > n = AgregarNormal f1 (comprimirDesdeLista (f2:fs) u n)
                                    | otherwise = AgregarComprimido fc (comprimirDesdeLista (f2:fs) u n)
                                      where fc = pixelsDiferentesEnFrame f1 f2 u
+
 -- Ejercicio 5/5
 descomprimir :: VideoComprimido -> Video
 descomprimir (IniciarComp f) = Iniciar f
-descomprimir (AgregarComprimido fc (AgregarNormal f v)) = Agregar (descomprimirFrame fc f) (descomprimir AgregarNormal f v)
-
-descomprimir = error "Implementar!!! (ejercicio 5)"
-
+descomprimir (AgregarNormal f v) = Agregar f (descomprimir v)
+descomprimir (AgregarComprimido fc v) = Agregar (aplicarCambio (ultimoFrame vd) fc) vd
+                                        where vd = descomprimir v
 
 -- Funciones provistas por la cátedra
 sumarCambios :: FrameComprimido -> FrameComprimido -> FrameComprimido
