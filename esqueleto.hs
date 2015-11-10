@@ -48,26 +48,36 @@ pixelsDiferentesEnFrame f1 f2 u = filtraUmbral (frmDeflate (frmResta f1 f2) 0) u
 type FrameDelta = [[PixelDelta]]
 
 -- pixResta nos permite obtener a partir de dos pixeles la diferencia entre los mismos.
+-- (pixResta a b) es el vector b menos el vector a
 pixResta :: Pixel -> Pixel -> PixelDelta
 pixResta (r1, g1, b1) (r2, g2, b2) = (r1 - r2, g1 - g2, b1 - b2)
 
 -- filaResta es la diferencia pixel a pixel entre las filas analogas de dos frames.
+-- (filaResta X Y) es la lista cuyo i-esimo elemento es (pixResta X(i) Y(i)) donde X(i),Y(i) son los elementos i-esimos de X,Y respectivamente
 filaResta :: [Pixel] -> [Pixel] -> [PixelDelta]
 filaResta [] [] = []
 filaResta (pixel1:pixels1) (pixel2:pixels2) = (pixResta pixel1 pixel2):(filaResta pixels1 pixels2)
 
+--frmResta efectua la resta lista a lista entre los dos frames (las listas del segundo frame menos las listas del primer frame), es decir:
+-- (frmResta A B) es una lista que tiene como i-esimo elemento a la lista (filaResta A(i) B(i)) con A(i),B(i) los i-esimos elementos (listas) de A,B respectivamente
 frmResta :: Frame -> Frame -> FrameDelta
 frmResta [] [] = []
 frmResta (fila1:filas1) (fila2:filas2) = (filaResta fila1 fila2):(frmResta filas1 filas2)
 
+--Podemos ver al FrameComprimido como una matriz: un FrameComprimido es una lista de elementos del tipo (f(i),c(j),p), con f y c enteros y p un PixelDelta, y la matriz de este Framecomprimido es aquella cuyo elemento de la fila i y la columna j es (f(i),c(j),p).
+--frmDeflateFila construye un FrameComprimido a partir de una lista [PixelDelta] y dos enteros (f: fila, c: columna)
+--Sea la lista P = [p0,p1,p2,p3,...], con P un elemento de [PixelDelta], y sean f c dos enteros
+--Entonces (frmDeFlateFila P f c) es la lista siguiente: [(f,c,p0),(f,c+1,p1),(f,c+2,p2),(f,c+3,p3),...]
 frmDeflateFila :: [PixelDelta] -> Integer -> Integer -> FrameComprimido
 frmDeflateFila [] f c = []
 frmDeflateFila (px:pxs) f c = (f, c, px):(frmDeflateFila pxs f (c + 1))
 
+--frmDeflate construye un FrameComprimido de manera que, visto como matriz, su elemento en la fila i y columna j tenga la forma (i-1,j-1,p), es decir f(i)=i-1, c(j)=j-1
 frmDeflate :: FrameDelta -> Integer -> FrameComprimido
 frmDeflate [] f = []
 frmDeflate (fila:filas) f = (frmDeflateFila fila f 0) ++ (frmDeflate filas (f + 1))
 
+--filtraUmbral toma un FrameComprimido (viendolo como lista) y le quita todos los elementos (f,c,p) tales que la norma de p no supere cierto umbral u
 filtraUmbral :: FrameComprimido -> Float -> FrameComprimido
 filtraUmbral [] u = []
 filtraUmbral ((f, c, dpx):fc) u | norma dpx > u = (f, c, dpx):(filtraUmbral fc u)
@@ -79,10 +89,16 @@ comprimir v u n = comprimirDesdeLista (listaDesdeVideo v) u n
 
 -- Auxiliares Ejercicio 4
 -- Invierten
+-- listaDesdeVideo toma un video y lo ve como una lista de frames ordenada desde el ultimo frame hasta el primer frame (es decir el video esta invertido cuando se lo ve como lista con esta funcion)
 listaDesdeVideo :: Video -> [Frame]
 listaDesdeVideo (Iniciar f) = f:[]
 listaDesdeVideo (Agregar f v) = f:(listaDesdeVideo v)
 
+-- comprimirDesdeLista toma una lista de frames y construye un VideoComprimido de la siguiente manera:
+-- Si la lista dada es [f(0),f(1),f(2),...,f(n)], entonces el i-esimo frame (F(i)) del video comprimido va a ser (con i entero entre 1 y n):
+--1) F(i)=f(n-i), si f(n-i) y f(n-i+1) no son similares (y entonces se pone el frame original f(n-i))
+--2) F(i)=f*(n-i), si f(n-i) y f(n-i+1) son similares, con f*(n-i) el frame comprimido que resulta de comparar f(n-i) y f(n-i+1)
+--3) F(i)=f(n), si i=0 (es decir F(0)=f(n))
 comprimirDesdeLista :: [Frame] -> Float -> Integer -> VideoComprimido
 comprimirDesdeLista (f:[]) u n = IniciarComp f
 comprimirDesdeLista (f1:f2:fs) u n | fromIntegral (length(fc)) > n = AgregarNormal f1 (comprimirDesdeLista (f2:fs) u n)
